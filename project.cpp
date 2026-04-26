@@ -90,7 +90,7 @@ void login()
             found=true;
             cout<<"\tLogin Successful...\n";
             afterLogin(id);
-            Sleep(10000);
+            Sleep(5000);
             break;
         }
     }
