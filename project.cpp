@@ -4,19 +4,15 @@
 #include<sstream>
 using namespace std;
 
-class Login         //login class
+class Login //login class
 {
 private:     string LoginID,Password;
 public:
-    void setID(string id)
-    { LoginID=id; }
-    void setPW(string pw)
-    { Password=pw; }
+    void setID(string id){ LoginID=id; }
+    void setPW(string pw){ Password=pw; }
 
-    string getID()
-    { return LoginID; }
-    string getPW()
-    { return Password; }
+    string getID(){ return LoginID; }
+    string getPW(){ return Password; }
 };
 
 bool isUserExists(string id)   //if user already exist with same id
@@ -34,6 +30,92 @@ bool isUserExists(string id)   //if user already exist with same id
             return true;
     }
     return false;
+}
+
+void changePassword(string id)      // Change password 
+{
+    ifstream infile("Login.txt");
+    ofstream temp("temp.txt");
+    string line;
+    string newpw;
+
+    cout<<"\tEnter New Password (min 8 chars): ";
+    cin>>newpw;
+    if(newpw.length() < 8)
+    {
+        cout<<"\tPassword too short!\n";
+        return;
+    }
+    while(getline(infile,line))
+    {
+        stringstream ss(line);
+        string uid, pw;
+        getline(ss, uid, ':');
+        getline(ss, pw);
+
+        if(uid == id)
+        {
+            temp << uid << ":" << newpw << endl;
+        }
+        else
+        {
+            temp << uid << ":" << pw << endl;
+        }
+    }
+
+    infile.close();
+    temp.close();
+    remove("Login.txt");
+    rename("temp.txt","Login.txt");
+
+    cout<<"\tPassword Changed Successfully!\n";
+}
+
+void deleteAccount(string id)               //Delete account
+{
+    ifstream infile("Login.txt");
+    ofstream temp("temp.txt");
+    string line;
+
+    while(getline(infile,line))
+    {
+        stringstream ss(line);
+        string uid, pw;
+        getline(ss, uid, ':');
+        getline(ss, pw);
+        if(uid != id)
+        {
+            temp << uid << ":" << pw << endl;
+        }
+    }
+
+    infile.close();
+    temp.close();
+    remove("Login.txt");
+    rename("temp.txt","Login.txt");
+    cout<<"\tAccount Deleted Successfully!\n";
+}
+
+void userMenu(string id)
+{
+    int choice;
+    do {
+        cout<<"\n\n\t===== USER MENU =====\n";
+        cout<<"\t1. Change Password\n";
+        cout<<"\t2. Delete Account\n";
+        cout<<"\t3. Logout\n";
+        cout<<"\tEnter choice: ";
+        cin>>choice;
+        if(choice == 1)
+        {
+            changePassword(id);
+        }
+        else if(choice == 2)
+        {
+            deleteAccount(id);
+            break;
+        }
+    } while(choice != 3);
 }
 
 void registration()
@@ -61,11 +143,6 @@ void registration()
     Sleep(1000);
 }
 
-void afterLogin(string id)
-{
-    cout<<endl<<"Welcome to your account "<<id<<"!!";  
-}
-
 void login()
 {
     system("cls");
@@ -89,8 +166,8 @@ void login()
         {
             found=true;
             cout<<"\tLogin Successful...\n";
-            afterLogin(id);
-            Sleep(5000);
+            Sleep(1000);
+            userMenu(id);
             break;
         }
     }
